@@ -12,6 +12,7 @@ public class listagemVIEW extends javax.swing.JFrame {
     public listagemVIEW() {
         initComponents();
         listarProdutos();
+
     }
 
     @SuppressWarnings("unchecked")
@@ -113,7 +114,7 @@ public class listagemVIEW extends javax.swing.JFrame {
                     .addComponent(btnVender))
                 .addGap(29, 29, 29)
                 .addComponent(jSeparator1, javax.swing.GroupLayout.PREFERRED_SIZE, 10, javax.swing.GroupLayout.PREFERRED_SIZE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 67, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(btnVendas)
                     .addComponent(btnVoltar))
@@ -127,24 +128,22 @@ public class listagemVIEW extends javax.swing.JFrame {
     private void btnVenderActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVenderActionPerformed
         String id = id_produto_venda.getText();
 
-        ProdutosDAO produtosdao = new ProdutosDAO();
-
-        listarProdutos();
-    }//GEN-LAST:event_btnVenderActionPerformed
-
-    private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
-        String id = id_produto_venda.getText();
-
         if (id.isEmpty()) {
-            JOptionPane.showMessageDialog(null, "Informe o ID do produto para vender!");
+            JOptionPane.showMessageDialog(null, "Informe o ID do produto!");
             return;
         }
 
         ProdutosDAO produtosdao = new ProdutosDAO();
         produtosdao.venderProduto(Integer.parseInt(id));
 
-        // Atualiza a tabela após a venda
-        listarProdutos();
+        listarProdutos(); // atualiza listagem
+    }//GEN-LAST:event_btnVenderActionPerformed
+
+    private void btnVendasActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVendasActionPerformed
+        ListaProdutosVendidos vendidos = new ListaProdutosVendidos();
+        vendidos.setLocationRelativeTo(this);
+        vendidos.setVisible(true);
+
     }//GEN-LAST:event_btnVendasActionPerformed
 
     private void btnVoltarActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnVoltarActionPerformed
@@ -160,6 +159,29 @@ public class listagemVIEW extends javax.swing.JFrame {
         });
     }
 
+    // Método para listar produtos
+    private void listarProdutos() {
+        try {
+            ProdutosDAO produtosdao = new ProdutosDAO();
+            DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
+            model.setNumRows(0);
+
+            ArrayList<ProdutosDTO> listagem = produtosdao.listarProdutosVendidos();
+
+            for (ProdutosDTO p : listagem) {
+                model.addRow(new Object[]{
+                    p.getId(),
+                    p.getNome(),
+                    p.getValor(),
+                    p.getStatus()
+                });
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null, "Erro ao listar: " + e.getMessage());
+        }
+    }
+
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnVendas;
     private javax.swing.JButton btnVender;
@@ -173,25 +195,4 @@ public class listagemVIEW extends javax.swing.JFrame {
     private javax.swing.JTable listaProdutos;
     // End of variables declaration//GEN-END:variables
 
-    private void listarProdutos() {
-        try {
-            ProdutosDAO produtosdao = new ProdutosDAO();
-
-            DefaultTableModel model = (DefaultTableModel) listaProdutos.getModel();
-            model.setNumRows(0);
-
-            ArrayList<ProdutosDTO> listagem = produtosdao.listarProdutos();
-
-            for (int i = 0; i < listagem.size(); i++) {
-                model.addRow(new Object[]{
-                    listagem.get(i).getId(),
-                    listagem.get(i).getNome(),
-                    listagem.get(i).getValor(),
-                    listagem.get(i).getStatus()
-                });
-            }
-        } catch (Exception e) {
-        }
-
-    }
 }
